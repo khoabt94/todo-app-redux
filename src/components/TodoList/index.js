@@ -1,4 +1,5 @@
 import { Button, Col, Input, Row, Select, Tag } from "antd";
+import Text from "antd/lib/typography/Text";
 import { useDispatch, useSelector } from "react-redux";
 import { useState } from "react/cjs/react.development";
 import { v4 as uuidv4 } from "uuid";
@@ -9,17 +10,27 @@ import { todoActions } from "./TodoSlice";
 export default function TodoList() {
   const [name, setName] = useState("");
   const [priority, setPriority] = useState("Low");
+  const [error, setError] = useState("");
 
   const todoFilter = useSelector(todoFilterSelector);
-  console.log(todoFilter);
 
   const dispatch = useDispatch();
 
-  const handleInputChange = (e) => setName(e.target.value);
+  const handleInputChange = (e) => {
+    setName(e.target.value);
+    if (name.length < 10) {
+      setError("Please input a todo no less than 10 letters");
+      return;
+    } else setError("");
+  };
 
   const handlePriorityChange = (value) => setPriority(value);
 
   const handleSubmitToDo = () => {
+    if (name.length < 10) {
+      setError("Please input a todo no less than 10 letters");
+      return;
+    }
     const action = todoActions.createTodo({
       id: uuidv4(),
       name,
@@ -66,6 +77,9 @@ export default function TodoList() {
             Add
           </Button>
         </Input.Group>
+      </Col>
+      <Col span={24} className="error-message">
+        {error && <p>{error}</p>}
       </Col>
     </Row>
   );
